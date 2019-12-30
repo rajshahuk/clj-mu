@@ -70,3 +70,17 @@
       (is (not (nil? response-https)))
       (is (= 404 (:status response-https)))
       )))
+
+(deftest hello-world
+  (testing "a very basic functional GET request"
+    (let [mu-builder (configure-mu)
+          mu-server (-> mu-builder
+                        (GET "/" (fn [request] {:status 200 :body "Hello, World!"}))
+                        (start-mu))
+          mu-uri (.uri mu-server)
+          response (client/get (.toString mu-uri))
+          _ (log/info "response:" response)]
+      (is (= 200 (:status response)))
+      (is (= "Hello, World!" (:body response)))
+      )
+    ))
