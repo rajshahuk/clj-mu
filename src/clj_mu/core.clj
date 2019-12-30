@@ -10,12 +10,14 @@
 
   options need to be passed in as a map as follows
 
-  :port     - http port to start up on"
+  :port           - http port to start up on
+  :https-port     - https port to start up on"
   ([]
    (run-mu {}))
   ([options]
   (let [mu-builder (cond-> (MuServerBuilder/httpServer)
                    (integer? (:port options)) (.withHttpPort (:port options))
+                   (integer? (:https-port options)) (.withHttpsPort (:https-port options))
                )]
     (try
       (.start mu-builder)
