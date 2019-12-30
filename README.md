@@ -23,8 +23,7 @@ start and run a basic mu-server like this:
       mu-server (-> mu-builder
                     (GET "/" (fn [request] {:status 200 :body "Hello, World!"}))
                     (start-mu))]
-      (println (str "Mu started here: " (.toString (.uri mu-server))) )
-)
+      (println (str "Mu started here: " (.toString (.uri mu-server)))))
 ```
 
 ### Requests
