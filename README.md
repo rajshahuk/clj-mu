@@ -10,6 +10,22 @@ with a few to keep dependencies down to a minimum and as a result does not try t
 other popular frameworks such as ring or compojure. This library has however been heavily inspired
 by them after more than a year of building services with them.
 
+### Get started quickly
+
+Add clj-mu as a dependency to your project and then add the following to your `require` definition
+```clojure
+[clj-mu.core :refer :all]
+```
+
+start and run a basic mu-server like this:
+```clojure
+(let [mu-builder (configure-mu)
+      mu-server (-> mu-builder
+                    (GET "/" (fn [request] {:status 200 :body "Hello, World!"}))
+                    (start-mu))]
+      (println (str "Mu started here: " (.toString (.uri mu-server))) )
+)
+```
 
 ### Requests
 
