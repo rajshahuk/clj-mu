@@ -3,8 +3,7 @@
             [clj-mu.core :refer :all]
             [clojure.tools.logging :as log]
             [clj-http.client :as client])
-  (:import (io.muserver MuServer)
-           (java.net ServerSocket)))
+  (:import (java.net ServerSocket)))
 
 (deftest a-test
   (testing "FIXME, I fail."

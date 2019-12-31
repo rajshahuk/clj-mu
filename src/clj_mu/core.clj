@@ -28,7 +28,7 @@
    }
   )
 
-(defn add-cookies
+(defn- add-cookies
   "add cookies to the response
    cookies are a map with the key as the name of the cookie and the value as as the cookie details"
   [^MuResponse response cookies]
@@ -62,7 +62,19 @@
         (when cookies (add-cookies res cookies))
         (.write res body)))))
 
-(defn GET [mu-builder path handler]
+(defn DELETE [^MuServerBuilder mu-builder path handler]
+  (.addHandler mu-builder Method/DELETE path (create-route-handler handler)))
+
+(defn PUT [^MuServerBuilder mu-builder path handler]
+  (.addHandler mu-builder Method/PUT path (create-route-handler handler)))
+
+(defn HEAD [^MuServerBuilder mu-builder path handler]
+  (.addHandler mu-builder Method/HEAD path (create-route-handler handler)))
+
+(defn POST [^MuServerBuilder mu-builder path handler]
+  (.addHandler mu-builder Method/POST path (create-route-handler handler)))
+
+(defn GET [^MuServerBuilder mu-builder path handler]
   (.addHandler mu-builder Method/GET path (create-route-handler handler)))
 
 (defn ^MuServerBuilder configure-mu

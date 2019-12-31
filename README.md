@@ -34,12 +34,24 @@ start and run a basic mu-server like this:
 
 ### Requests
 
+The following request types are supported:
+   * GET
+   * POST
+   * HEAD
+   * PUT
+   * DELETE
+   
+The way to define a route is like this `(METHOD PATH HANDLER)` e.g.
+```clojure
+(POST "/submit" handler)
+```
+
 A request handler is defined like this:
 
 ```clojure
 (fn [request]
   ;; body of request
-  ;; response is returned as map as per below "Response section
+  ;; response is returned as map as per below "Responses" section
   ) 
 ```
 
