@@ -1,5 +1,4 @@
 # clj-mu
---
 
 [![Build Status](https://api.travis-ci.org/rajshahuk/clj-mu.png?branch=master)](http://travis-ci.org/rajshahuk/clj-mu)
 
@@ -9,7 +8,7 @@ built to 'scratch my own itch'**
 Clojure friendly library for using https://muserver.io
 
 This library has been written to allow more a _clojure-ey_ way to use MuServer. It has been written
-with a few to keep dependencies down to a minimum and as a result does not try to compatible with
+with a view to keep dependencies down to a minimum and as a result does not try to compatible with
 other popular frameworks such as ring or compojure. This library has however been heavily inspired
 by them after more than a year of building services with them.
 
@@ -67,7 +66,9 @@ Responses are always returned as a map. The map has the following mandatory keys
    
 The follow are optional:
 
-   * headers - standard http headers that will be added to the response
+   * headers - http headers that will be added to the response. These are key/value pairs as you would have
+    in the http response
+   * cookies
    
 #### Example
 
