@@ -1,12 +1,38 @@
 (ns clj-mu.core
   (:require
     [clojure.tools.logging :as log])
-  (:import (io.muserver MuServer MuServerBuilder RouteHandler Method)))
+  (:import (io.muserver MuServer MuServerBuilder RouteHandler Method MuRequest)))
+
+(defn extract-request
+  "return more of a clojure style request object back so that the handler can be more clojure like"
+  [^MuRequest request params]
+  {
+   :original-mu-request request
+   :method              (.name (.method request))
+   :protocol            (.protocol request)
+   :remote-address      (.remoteAddress request)
+   :relative-path       (.relativePath request)
+   :context-path        (.contextPath request)
+   :uri                 (.toString (.uri request))
+   :path-params         (clojure.walk/keywordize-keys (into {} params))
+   :query-params        (reduce (fn [a v]
+                                  (assoc a
+                                    (keyword (.getKey v))
+                                    (into [] (.getValue v))
+                                    )) {} (iterator-seq (.iterator (.entrySet (.all (.query request))))))
+   :headers             (reduce (fn [a v]
+                                  (assoc a
+                                    (keyword (.getKey v))
+                                    (.getValue v)
+                                    )) {} (iterator-seq (.iterator (.headers request))))
+   }
+  )
 
 (defn create-route-handler [handler]
   (reify RouteHandler
     (handle [_ req res params]
-      (let [{body :body headers :headers status :status} (handler req)]
+      (let [request (extract-request req params)
+            {body :body headers :headers status :status} (handler request)]
         (.status res status)
         (when headers
           (let [hdrs (.headers res)]

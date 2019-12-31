@@ -81,6 +81,61 @@
           response (client/get (.toString mu-uri))
           _ (log/info "response:" response)]
       (is (= 200 (:status response)))
-      (is (= "Hello, World!" (:body response)))
-      )
-    ))
+      (is (= "Hello, World!" (:body response))))))
+
+
+(deftest clojure-like-request-thing
+  (testing "for a basic GET call we get back a clojure map as the request"
+    (let [mu-builder (configure-mu)
+          request-atom (atom nil)
+          mu-server (-> mu-builder
+                        (GET "/" (fn [request]
+                                   (do
+                                     (reset! request-atom request)
+                                     {:status 200 :body "Hello, World!"})))
+                        (start-mu))
+          mu-uri (.uri mu-server)
+          response (client/get (.toString mu-uri))
+          _ (log/info "request:" @request-atom)]
+      (is (= 200 (:status response)))
+      (is (= "GET" (:method @request-atom)))
+      (is (= "HTTP/1.1" (:protocol @request-atom)))
+      (is (= "" (:context-path @request-atom)))
+      (is (= "close" (:Connection (:headers @request-atom))))
+      (is (clojure.string/includes? (:uri @request-atom) "localhost"))
+      (is (= {} (:path-params @request-atom)))
+      )))
+
+(deftest check-params-on-url
+  (testing "for a basic GET call we get back a clojure map as the request"
+    (let [mu-builder (configure-mu)
+          request-atom (atom nil)
+          mu-server (-> mu-builder
+                        (GET "/{name}/{blah}" (fn [request]
+                                   (do
+                                     (reset! request-atom request)
+                                     {:status 200 :body "Hello, World!"})))
+                        (start-mu))
+          mu-uri (.uri mu-server)
+          response (client/get (str (.toString mu-uri) "/rajshahuk/shouldbeblah"))
+          _ (log/info "request:" @request-atom)]
+      (is (= 200 (:status response)))
+      (is (= {:name "rajshahuk" :blah "shouldbeblah"} (:path-params @request-atom)))
+      )))
+
+(deftest check-query-params-on-url
+  (testing "for a basic GET call we get back a clojure map as the request"
+    (let [mu-builder (configure-mu)
+          request-atom (atom nil)
+          mu-server (-> mu-builder
+                        (GET "/" (fn [request]
+                                                (do
+                                                  (reset! request-atom request)
+                                                  {:status 200 :body "Hello, World!"})))
+                        (start-mu))
+          mu-uri (.uri mu-server)
+          response (client/get (str (.toString mu-uri) "/?name=rajshahuk&something=blah&something=blah2"))
+          _ (log/info "request:" @request-atom)]
+      (is (= 200 (:status response)))
+      (is (= {:name ["rajshahuk"] :something ["blah" "blah2"]} (:query-params @request-atom)))
+      )))
