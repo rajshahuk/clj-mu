@@ -139,3 +139,50 @@
       (is (= 200 (:status response)))
       (is (= {:name ["rajshahuk"] :something ["blah" "blah2"]} (:query-params @request-atom)))
       )))
+
+(deftest check-setting-headers-on-response
+  (testing "set some headers on the response and make sure that it works okay"
+    (let [mu-builder (configure-mu)
+          request-atom (atom nil)
+          mu-server (-> mu-builder
+                        (GET "/" (fn [request]
+                                   (do
+                                     (reset! request-atom request)
+                                     {:status 200
+                                      :body "Hello, World!"
+                                      :headers {"clj-mu-header" "best-clojure-web-server-eva"
+                                                "x-some-new-header" "value-for-some-new-header"}})))
+                        (start-mu))
+          mu-uri (.uri mu-server)
+          response (client/get (str (.toString mu-uri)))
+          _ (log/info "request:" @request-atom)]
+      (is (= 200 (:status response)))
+      (is (= "best-clojure-web-server-eva" (get (:headers response) "clj-mu-header")))
+      (is (= "value-for-some-new-header" (get (:headers response) "x-some-new-header")))
+      )))
+
+(deftest check-setting-cookies-on-response
+  (testing "set some cookies on the response and make sure that it works okay"
+    (let [mu-builder (configure-mu)
+          request-atom (atom nil)
+          mu-server (-> mu-builder
+                        (GET "/" (fn [request]
+                                   (do
+                                     (reset! request-atom request)
+                                     {:status 200
+                                      :body "Hello, World!"
+                                      :cookies {"cookie-one" {:value "cookie-one-value"}
+                                                "cookie-two" {:path "/somepath" :http-only "true" :value "cookie-two-value"}}
+                                      })))
+                        (start-mu))
+          mu-uri (.uri mu-server)
+          response (client/get (str (.toString mu-uri)))
+          cookie-one (get (:cookies response) "cookie-one")
+          cookie-two (get (:cookies response) "cookie-two")
+          _ (log/info "cookie-one:" cookie-one)
+          _ (log/info "cookie-two:" cookie-two)]
+      (is (= 200 (:status response)))
+      (is (= "cookie-one-value" (:value cookie-one)))
+      (is (= "/" (:path cookie-one)))
+      (is (false? (:secure cookie-one)))
+      (is (= "/somepath" (:path cookie-two))))))

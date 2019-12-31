@@ -1,7 +1,7 @@
 (ns clj-mu.core
   (:require
     [clojure.tools.logging :as log])
-  (:import (io.muserver MuServer MuServerBuilder RouteHandler Method MuRequest MuResponse)))
+  (:import (io.muserver MuServer MuServerBuilder RouteHandler Method MuRequest MuResponse CookieBuilder)))
 
 (defn extract-request
   "return more of a clojure style request object back so that the handler can be more clojure like"
@@ -28,16 +28,38 @@
    }
   )
 
+(defn add-cookies
+  "add cookies to the response
+   cookies are a map with the key as the name of the cookie and the value as as the cookie details"
+  [^MuResponse response cookies]
+  (doseq [[k v] cookies]
+    (log/info "cookies" k v)
+    (.addCookie response
+                (.build
+                  (cond-> (CookieBuilder/newCookie)
+                          true (.withName k)
+                          true (.withUrlEncodedValue (:value v))
+                          (string? (:path v)) (.withPath (:path v))
+                          (boolean? (:secure v)) (.secure (:secure v))
+                          (boolean? (:http-only v)) (.httpOnly (:http-only v))
+                          )))))
+
+(defn- add-headers
+  "add headers to the response"
+  [^MuResponse response headers]
+  (let [hdrs (.headers response)]
+    (doseq [[k, v] headers]
+      (.set hdrs (name k) v)))
+  )
+
 (defn create-route-handler [handler]
   (reify RouteHandler
     (handle [_ req res params]
       (let [request (extract-request req params)
-            {body :body headers :headers status :status} (handler request)]
+            {body :body headers :headers status :status cookies :cookies} (handler request)]
         (.status res status)
-        (when headers
-          (let [hdrs (.headers res)]
-            (doseq [[k, v] headers]
-              (.set hdrs (name k) v))))
+        (when headers (add-headers res headers))
+        (when cookies (add-cookies res cookies))
         (.write res body)))))
 
 (defn GET [mu-builder path handler]

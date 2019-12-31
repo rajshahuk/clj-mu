@@ -81,14 +81,15 @@ The follow are optional:
     :status 200
     :body   "Hello, World"
     :headers {
-      "content-type" "text/plain"
+      "content-type" "text/plain" ;; any set of key-value pairs
     }
     :cookies {
        "name-of-the-cookie" {
-          :path "/" ;; manditory
-          :value "the-value-for-my-cookie" ;; manditory
+          :value "the-value-for-my-cookie" ;; required value - without this you can't create a cookie.
+                                           ;; values are ALWAYS url encoded!
+          :path "/" ;; optional value - defaults to "/"
           :secure true ;; optional defaults to false
-          :http-only true ;; defaults to true
+          :http-only true ;; defaults to false
         }
     } 
 }
@@ -96,8 +97,9 @@ The follow are optional:
 
 ## TODO LIST
 
-- [ ] Write tests for sending headers on response
-- [ ] Implement cookies
-- [ ] Add the ability use contextPaths
-- [ ] Simple implementation for static files
-- [ ] Async!
+- ~~Write tests for sending headers on response~~
+- ~~Implement cookies~~
+- More tests for unhappy paths
+- Add the ability use contextPaths
+- Simple implementation for static files
+- Async!
