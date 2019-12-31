@@ -14,6 +14,10 @@ by them after more than a year of building services with them.
 
 ### Get started quickly
 
+#### Installation
+
+[![Clojars Project](https://img.shields.io/clojars/v/com.twelvenines/clj-mu.svg)](https://clojars.org/com.twelvenines/clj-mu)
+
 Add clj-mu as a dependency to your project and then add the following to your `require` definition
 ```clojure
 [clj-mu.core :refer :all]
