@@ -1,7 +1,7 @@
 (ns clj-mu.core
   (:require
     [clojure.tools.logging :as log])
-  (:import (io.muserver MuServer MuServerBuilder RouteHandler Method MuRequest)))
+  (:import (io.muserver MuServer MuServerBuilder RouteHandler Method MuRequest MuResponse)))
 
 (defn extract-request
   "return more of a clojure style request object back so that the handler can be more clojure like"
@@ -36,7 +36,7 @@
         (.status res status)
         (when headers
           (let [hdrs (.headers res)]
-            (doseq [[k, v] hdrs]
+            (doseq [[k, v] headers]
               (.set hdrs (name k) v))))
         (.write res body)))))
 

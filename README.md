@@ -72,7 +72,7 @@ The follow are optional:
 
    * headers - http headers that will be added to the response. These are key/value pairs as you would have
     in the http response
-   * cookies
+   * cookies - a map of one or more maps, as per the example below
    
 #### Example
 
@@ -83,5 +83,21 @@ The follow are optional:
     :headers {
       "content-type" "text/plain"
     }
+    :cookies {
+       "name-of-the-cookie" {
+          :path "/" ;; manditory
+          :value "the-value-for-my-cookie" ;; manditory
+          :secure true ;; optional defaults to false
+          :http-only true ;; defaults to true
+        }
+    } 
 }
 ```
+
+## TODO LIST
+
+- [ ] Write tests for sending headers on response
+- [ ] Implement cookies
+- [ ] Add the ability use contextPaths
+- [ ] Simple implementation for static files
+- [ ] Async!
