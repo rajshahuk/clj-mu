@@ -1,7 +1,8 @@
 (ns clj-mu.core
   (:require
     [clojure.tools.logging :as log])
-  (:import (io.muserver MuServer MuServerBuilder RouteHandler Method MuRequest MuResponse CookieBuilder)))
+  (:import (io.muserver MuServer MuServerBuilder RouteHandler Method MuRequest MuResponse CookieBuilder)
+           (io.muserver.handlers ResourceHandlerBuilder)))
 
 (defn extract-request
   "return more of a clojure style request object back so that the handler can be more clojure like"
@@ -77,6 +78,10 @@
 (defn GET [^MuServerBuilder mu-builder path handler]
   (.addHandler mu-builder Method/GET path (create-route-handler handler)))
 
+(defn STATIC
+  [^MuServerBuilder mu-builder file-root-if-exists classpath-root]
+  (.addHandler mu-builder (ResourceHandlerBuilder/fileOrClasspath file-root-if-exists classpath-root)))
+
 (defn ^MuServerBuilder configure-mu
   "configure mu-server with bunch of options. If no options are passed in mu will start an http server on a free port.
   This function does not start mu-server. See the start-mu function to start mu-server.
@@ -96,6 +101,17 @@
   "starts mu-server"
   [^MuServerBuilder mu-server-builder]
   (.start mu-server-builder))
+
+(defn stop-mu
+  "stops mu-server"
+  [^MuServer mu-server]
+  (try
+    (do
+      (.stop mu-server)
+      true)
+    (catch Exception e
+      (log/error "Unable to stop mu-server" e)
+      false)))
 
 (defn ^MuServer run-mu
   "helper function to help with some testing"

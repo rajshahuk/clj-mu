@@ -107,11 +107,29 @@ The follow are optional:
 }
 ```
 
+### Special Handlers
+
+#### Hosting static content
+
+mu-server has a really good way to handle static content, see the documentation here for more info:
+https://muserver.io/resources
+
+clj-mu provides a wrapper around this and defined in the `STATIC` function. The function takes two arguments, one for
+the file path and the other for the classpath. This is useful when running locally and when bundled as an uber-jar.
+
+```clojure
+(let [mu-builder (configure-mu)
+          mu-server (-> mu-builder
+                        (STATIC "test/resources" "resources")
+                        (start-mu))]
+      (println (str "Static web server started here: "(.uri mu-server))))
+```
+
 ## TODO LIST
 
 - ~~Write tests for sending headers on response~~
 - ~~Implement cookies~~
 - More tests for unhappy paths
 - Add the ability use contextPaths
-- Simple implementation for static files
+- ~~Simple implementation for static files~~
 - Async!

@@ -15,8 +15,9 @@
           mu-uri (.uri mu)
           _ (log/info "mu started here: " (.toString mu-uri))
           response (client/get (.toString mu-uri) {:throw-exceptions false})
-          _ (.stop mu)]
+          status (stop-mu mu)]
       (is (not (nil? response)))
+      (is (= true status))
       (is (= 404 (:status response))))))
 
 (defn- find-a-free-port
@@ -33,7 +34,7 @@
           _ (log/info "free port:" port)
           mu (run-mu {:port port})
           mu-uri (.uri mu)
-          _ (.stop mu)]
+          _ (stop-mu mu)]
       (is (= port (.getPort mu-uri)))
       )))
 
@@ -46,7 +47,7 @@
           _ (log/info "mu started here: " (.toString mu-uri))
           response (client/get (.toString mu-uri) {:insecure? true
                                                    :throw-exceptions false})
-          _ (.stop mu)]
+          _ (stop-mu mu)]
       (is (= port (.getPort mu-uri)))
       (is (not (nil? response)))
       (is (= 404 (:status response)))
@@ -61,7 +62,7 @@
           _ (log/info "mu started here:" (.toString mu-uri-http) "and here:" (.toString mu-uri-https))
           response-http (client/get (.toString mu-uri-http) {:throw-exceptions false})
           response-https (client/get (.toString mu-uri-http) {:insecure? true :throw-exceptions false})
-          _ (.stop mu)]
+          _ (stop-mu mu)]
       (is (= port-one (.getPort mu-uri-http)))
       (is (= port-two (.getPort mu-uri-https)))
       (is (not (nil? response-http)))
@@ -78,7 +79,8 @@
                         (start-mu))
           mu-uri (.uri mu-server)
           response (client/get (.toString mu-uri))
-          _ (log/info "response:" response)]
+          _ (log/info "response:" response)
+          _ (stop-mu mu-server)]
       (is (= 200 (:status response)))
       (is (= "Hello, World!" (:body response))))))
 
@@ -95,6 +97,7 @@
                         (start-mu))
           mu-uri (.uri mu-server)
           response (client/get (.toString mu-uri))
+          _ (stop-mu mu-server)
           _ (log/info "request:" @request-atom)]
       (is (= 200 (:status response)))
       (is (= "GET" (:method @request-atom)))
@@ -117,6 +120,7 @@
                         (start-mu))
           mu-uri (.uri mu-server)
           response (client/get (str (.toString mu-uri) "/rajshahuk/shouldbeblah"))
+          _ (stop-mu mu-server)
           _ (log/info "request:" @request-atom)]
       (is (= 200 (:status response)))
       (is (= {:name "rajshahuk" :blah "shouldbeblah"} (:path-params @request-atom)))
@@ -134,7 +138,8 @@
                         (start-mu))
           mu-uri (.uri mu-server)
           response (client/get (str (.toString mu-uri) "/?name=rajshahuk&something=blah&something=blah2"))
-          _ (log/info "request:" @request-atom)]
+          _ (log/info "request:" @request-atom)
+          _ (stop-mu mu-server)]
       (is (= 200 (:status response)))
       (is (= {:name ["rajshahuk"] :something ["blah" "blah2"]} (:query-params @request-atom)))
       )))
@@ -154,7 +159,8 @@
                         (start-mu))
           mu-uri (.uri mu-server)
           response (client/get (str (.toString mu-uri)))
-          _ (log/info "request:" @request-atom)]
+          _ (log/info "request:" @request-atom)
+          _ (stop-mu mu-server)]
       (is (= 200 (:status response)))
       (is (= "best-clojure-web-server-eva" (get (:headers response) "clj-mu-header")))
       (is (= "value-for-some-new-header" (get (:headers response) "x-some-new-header")))
@@ -176,6 +182,7 @@
                         (start-mu))
           mu-uri (.uri mu-server)
           response (client/get (str (.toString mu-uri)))
+          _ (stop-mu mu-server)
           cookie-one (get (:cookies response) "cookie-one")
           cookie-two (get (:cookies response) "cookie-two")
           _ (log/info "cookie-one:" cookie-one)
@@ -185,3 +192,21 @@
       (is (= "/" (:path cookie-one)))
       (is (false? (:secure cookie-one)))
       (is (= "/somepath" (:path cookie-two))))))
+
+(deftest test-static-file-server
+  (testing "to ensure that we can create a web server that services static files"
+    (let [mu-builder (configure-mu)
+          mu-server (-> mu-builder
+                        (STATIC "test/resources" "resources")
+                        (start-mu))
+          mu-uri (.uri mu-server)
+          response-one (client/get (str (.toString mu-uri)))
+          response-two (client/get (str (.toString mu-uri) "/subdirectory/blah.html"))
+          response-three (client/get (str (.toString mu-uri) "/favicon.ico") {:throw-exceptions false})
+          _ (stop-mu mu-server)]
+      (is (= 200 (:status response-one)))
+      (is (clojure.string/includes? (:body response-one) "Welcome to clj-mu"))
+      (is (= 200 (:status response-two)))
+      (is (clojure.string/includes? (:body response-two) "Blah!"))
+      (is (= 404 (:status response-three)))
+      )))

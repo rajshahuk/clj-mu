@@ -7,6 +7,7 @@
                  [io.muserver/mu-server "0.47.3"]
                  [org.clojure/tools.logging "0.5.0"]
                  [ch.qos.logback/logback-classic "1.2.3"]]
-  :profiles {:test {:dependencies [[clj-http "3.7.0"]]}}
+  :profiles {:test {:resource-paths ["test/resources"]
+                    :dependencies   [[clj-http "3.10.0"]]}}
   :repl-options {:init-ns clj-mu.core})
 
