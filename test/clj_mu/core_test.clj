@@ -210,3 +210,46 @@
       (is (clojure.string/includes? (:body response-two) "Blah!"))
       (is (= 404 (:status response-three)))
       )))
+
+(deftest test-serving-things-from-a-context
+  (testing "to ensure that we can create a web server that services static files"
+    (let [mu-builder (configure-mu)
+          mu-server (-> mu-builder
+                        (CONTEXT-> "/new-path"
+                                   (STATIC "test/resources" "resources")
+                                   (GET "/hello-world" (fn [request] {:status 200 :body "Hello, World!"})))
+                        (start-mu))
+          mu-uri (.uri mu-server)
+          response-one (client/get (str (.toString mu-uri)) {:throw-exceptions false})
+          response-two (client/get (str (.toString mu-uri) "/new-path/subdirectory/blah.html"))
+          response-thr (client/get (str (.toString mu-uri) "/new-path/hello-world"))
+          _ (stop-mu mu-server)]
+      (is (= 404 (:status response-one)))
+      (is (= 200 (:status response-two)))
+      (is (= 200 (:status response-thr)))
+      (is (clojure.string/includes? (:body response-two) "Blah!"))
+      (is (= "Hello, World!" (:body response-thr)))
+      )))
+
+(deftest test-serving-things-from-a-context
+  (testing "to ensure that we can create a web server that services static files"
+    (let [mu-builder (configure-mu)
+          mu-server (-> mu-builder
+                        (GET "/something" (fn [request] {:status 200 :body "No context"}))
+                        (CONTEXT-> "api"
+                                   (GET "/something" (fn [request] {:status 200 :body "First level context"}))
+                                   (CONTEXT-> "nested"
+                                              (GET "/something" (fn [request] {:status 200 :body "Nested context"}))))
+                        (start-mu))
+          mu-uri (.uri mu-server)
+          response-one (client/get (str (.toString mu-uri) "/something") {:throw-exceptions false})
+          response-two (client/get (str (.toString mu-uri) "/api/something"))
+          response-thr (client/get (str (.toString mu-uri) "/api/nested/something"))
+          _ (stop-mu mu-server)]
+      (is (= 200 (:status response-one)))
+      (is (= 200 (:status response-two)))
+      (is (= 200 (:status response-thr)))
+      (is (clojure.string/includes? (:body response-one) "No context"))
+      (is (clojure.string/includes? (:body response-two) "First level context"))
+      (is (clojure.string/includes? (:body response-thr) "Nested context"))
+      )))

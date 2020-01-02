@@ -1,7 +1,7 @@
 (ns clj-mu.core
   (:require
     [clojure.tools.logging :as log])
-  (:import (io.muserver MuServer MuServerBuilder RouteHandler Method MuRequest MuResponse CookieBuilder)
+  (:import (io.muserver MuServer MuServerBuilder RouteHandler Method MuRequest MuResponse CookieBuilder ContextHandlerBuilder)
            (io.muserver.handlers ResourceHandlerBuilder)))
 
 (defn extract-request
@@ -63,24 +63,28 @@
         (when cookies (add-cookies res cookies))
         (.write res body)))))
 
-(defn DELETE [^MuServerBuilder mu-builder path handler]
+(defn DELETE [mu-builder path handler]
   (.addHandler mu-builder Method/DELETE path (create-route-handler handler)))
 
-(defn PUT [^MuServerBuilder mu-builder path handler]
+(defn PUT [mu-builder path handler]
   (.addHandler mu-builder Method/PUT path (create-route-handler handler)))
 
-(defn HEAD [^MuServerBuilder mu-builder path handler]
+(defn HEAD [mu-builder path handler]
   (.addHandler mu-builder Method/HEAD path (create-route-handler handler)))
 
-(defn POST [^MuServerBuilder mu-builder path handler]
+(defn POST [mu-builder path handler]
   (.addHandler mu-builder Method/POST path (create-route-handler handler)))
 
-(defn GET [^MuServerBuilder mu-builder path handler]
+(defn GET [mu-builder path handler]
   (.addHandler mu-builder Method/GET path (create-route-handler handler)))
 
 (defn STATIC
-  [^MuServerBuilder mu-builder file-root-if-exists classpath-root]
+  [mu-builder file-root-if-exists classpath-root]
   (.addHandler mu-builder (ResourceHandlerBuilder/fileOrClasspath file-root-if-exists classpath-root)))
+
+(defmacro CONTEXT-> [^MuServerBuilder mu-builder path & handlers]
+  `(.addHandler ~mu-builder (-> (ContextHandlerBuilder/context ~path)
+                                ~@handlers)))
 
 (defn ^MuServerBuilder configure-mu
   "configure mu-server with bunch of options. If no options are passed in mu will start an http server on a free port.

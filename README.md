@@ -73,6 +73,30 @@ The `request` parameter passed into the function has the following key/values:
 }
 ```
 
+#### Path Contexts
+
+muserver has a nice way to define path contexts and this is ported over to clj-mu. The documentation on muserver
+is here: https://muserver.io/contexts
+
+Let's take the 3 paths in the muserver docus and see how they would be implemented in clj-mu
+
+   * `/something`
+   * `/api/something`
+   * `/api/nested/something`
+   
+```clojure
+(let [mu-builder (configure-mu)
+          mu-server (-> mu-builder
+                        (GET "/something" (fn [request] {:status 200 :body "No context"}))
+                        (CONTEXT-> "api"
+                           (GET "/something" (fn [request] {:status 200 :body "First level context"}))
+                           (CONTEXT-> "nested"
+                              (GET "/something" (fn [request] {:status 200 :body "Nested context"}))))
+                        (start-mu))]
+  (println (str "Static web server started here: "(.uri mu-server))))
+```
+
+
 ### Responses
 
 Responses are always returned as a map. The map has the following mandatory keys:
@@ -111,7 +135,7 @@ The follow are optional:
 
 #### Hosting static content
 
-mu-server has a really good way to handle static content, see the documentation here for more info:
+muserver has a really good way to handle static content, see the documentation here for more info:
 https://muserver.io/resources
 
 clj-mu provides a wrapper around this and defined in the `STATIC` function. The function takes two arguments, one for
@@ -130,6 +154,6 @@ the file path and the other for the classpath. This is useful when running local
 - ~~Write tests for sending headers on response~~
 - ~~Implement cookies~~
 - More tests for unhappy paths
-- Add the ability use contextPaths
+- ~~Add the ability use contextPaths~~
 - ~~Simple implementation for static files~~
 - Async!
