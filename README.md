@@ -151,10 +151,11 @@ the file path and the other for the classpath. This is useful when running local
 
 ## TODO LIST
 
-- Extracting form params
+- HEAD and PUT requests
 - Async!
 - More tests for unhappy paths
 - ~~Write tests for sending headers on response~~
 - ~~Implement cookies~~
 - ~~Add the ability use contextPaths~~
 - ~~Simple implementation for static files~~
+- ~~Extracting form params~~

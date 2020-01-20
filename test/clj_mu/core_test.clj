@@ -253,3 +253,33 @@
       (is (clojure.string/includes? (:body response-two) "First level context"))
       (is (clojure.string/includes? (:body response-thr) "Nested context"))
       )))
+
+(deftest test-form-parameters
+  (testing "to ensure that nil is returned when there is no form"
+    (let [mu-builder (configure-mu)
+          mu-server (-> mu-builder (POST "/something"
+                                         (fn [request]
+                                           {:status 200 :body (:form-params request)}))
+                        (start-mu))
+          mu-uri (.uri mu-server)
+          response (client/post (str (.toString mu-uri) "/something") {:throw-exceptions false})
+          _ (stop-mu mu-server)]
+      (is (= 200 (:status response)))
+      (is (= "" (:body response)))
+      ))
+  (testing "to ensure that all form params are available"
+    (let [mu-builder (configure-mu)
+          mu-server (-> mu-builder (POST "/something"
+                                         (fn [request]
+                                           {:status 200
+                                            :body (cheshire.core/generate-string (:form-params request))} ))
+                        (start-mu))
+          mu-uri (.uri mu-server)
+          response (client/post (str (.toString mu-uri) "/something") {:form-params {:foo "bar"
+                                                                                     "foo" "bars"
+                                                                                     :cat "dog"}
+                                                                       :throw-exceptions false})
+          _ (stop-mu mu-server)]
+      (is (= 200 (:status response)))
+      (is (= "{\"foo\":[\"bar\",\"bars\"],\"cat\":[\"dog\"]}" (:body response)))
+      )))

@@ -16,18 +16,24 @@
    :context-path        (.contextPath request)
    :uri                 (.toString (.uri request))
    :path-params         (clojure.walk/keywordize-keys (into {} params))
+   :form-params         (try
+                          (reduce (fn [a v]
+                                    (assoc a
+                                      (keyword (.getKey v))
+                                      (into [] (.getValue v))
+                                      )) {} (iterator-seq (-> request .form .all .entrySet .iterator)))
+                          (catch Exception e nil))
    :query-params        (reduce (fn [a v]
                                   (assoc a
                                     (keyword (.getKey v))
                                     (into [] (.getValue v))
-                                    )) {} (iterator-seq (.iterator (.entrySet (.all (.query request))))))
+                                    )) {} (iterator-seq (-> request .query .all .entrySet .iterator)))
    :headers             (reduce (fn [a v]
                                   (assoc a
                                     (keyword (.getKey v))
                                     (.getValue v)
                                     )) {} (iterator-seq (.iterator (.headers request))))
-   }
-  )
+   })
 
 (defn- add-cookies
   "add cookies to the response
