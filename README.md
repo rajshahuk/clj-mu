@@ -152,6 +152,7 @@ the file path and the other for the classpath. This is useful when running local
 ## TODO LIST
 
 - HEAD and PUT requests
+- File Upload support
 - Async!
 - More tests for unhappy paths
 - ~~Write tests for sending headers on response~~
