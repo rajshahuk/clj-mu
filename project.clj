@@ -4,11 +4,11 @@
   :license {:name "MIT License"
             :url "https://github.com/rajshahuk/clj-mu/blob/master/LICENSE"}
   :dependencies [[org.clojure/clojure "1.10.1"]
-                 [io.muserver/mu-server "0.47.6"]
-                 [org.clojure/tools.logging "0.5.0"]
+                 [io.muserver/mu-server "0.48.0"]
+                 [org.clojure/tools.logging "0.6.0"]
                  [ch.qos.logback/logback-classic "1.2.3"]]
   :profiles {:test {:resource-paths ["test/resources"]
-                    :dependencies   [[cheshire "5.9.0"]
+                    :dependencies   [[cheshire "5.10.0"]
                                      [clj-http "3.10.0"]]}}
   :repl-options {:init-ns clj-mu.core})
 
