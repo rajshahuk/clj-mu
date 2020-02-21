@@ -1,4 +1,4 @@
-(defproject com.twelvenines/clj-mu "0.0.5"
+(defproject com.twelvenines/clj-mu "0.0.6"
   :description "Clojure friendly library for using https://muserver.io"
   :url "https://github.com/rajshahuk/clj-mu"
   :license {:name "MIT License"
