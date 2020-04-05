@@ -70,6 +70,22 @@ The `request` parameter passed into the function has the following key/values:
    :query-params        QUERY_PARAMETERS_AS_A_MAP ;; n.b. values are in a list as there
                                                   ;; could be more than one for each key
    :headers             HEADERS_AS_A_MAP
+   :cookies             LIST_OF_COOKIES_FOR_THIS_REQUEST 
+}
+```
+
+#### Reading cookies on the request
+
+Cookies are a list of clojure maps with the following keys:
+```clojure
+{
+   :name       COOKIE_NAME
+   :value      COOKIE_VALUE
+   :domain     COOKIE_DOMAIN
+   :path       COOKIE_PATH
+   :max-age    MAX_AGE_AS_LONG
+   :secure?    TRUE / FALSE
+   :http-only? TRUE / FALSE
 }
 ```
 
@@ -124,8 +140,8 @@ The follow are optional:
           :value "the-value-for-my-cookie" ;; required value - without this you can't create a cookie.
                                            ;; values are ALWAYS url encoded!
           :path "/" ;; optional value - defaults to "/"
-          :secure true ;; optional defaults to false
-          :http-only true ;; defaults to false
+          :secure? true ;; optional defaults to false
+          :http-only? true ;; defaults to false
         }
     } 
 }

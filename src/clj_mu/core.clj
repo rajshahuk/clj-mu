@@ -4,6 +4,17 @@
   (:import (io.muserver MuServer MuServerBuilder RouteHandler Method MuRequest MuResponse CookieBuilder ContextHandlerBuilder)
            (io.muserver.handlers ResourceHandlerBuilder)))
 
+(defn- extract-cookie
+  [cookie]
+  {:name       (.name cookie)
+   :value      (.value cookie)
+   :domain     (.domain cookie)
+   :path       (.path cookie)
+   :max-age    (.maxAge cookie)
+   :secure?    (.isSecure cookie)
+   :http-only? (.isHttpOnly cookie)
+   })
+
 (defn extract-request
   "return more of a clojure style request object back so that the handler can be more clojure like"
   [^MuRequest request params]
@@ -15,6 +26,10 @@
    :relative-path       (.relativePath request)
    :context-path        (.contextPath request)
    :uri                 (.toString (.uri request))
+   :cookies             (when (not (.isEmpty (.cookies request)))
+                          (reduce (fn [a cookie]
+                                    (conj a (extract-cookie cookie)))
+                                  [] (iterator-seq (-> request .cookies .iterator))))
    :path-params         (clojure.walk/keywordize-keys (into {} params))
    :form-params         (try
                           (reduce (fn [a v]
@@ -47,8 +62,8 @@
                           true (.withName k)
                           true (.withUrlEncodedValue (:value v))
                           (string? (:path v)) (.withPath (:path v))
-                          (boolean? (:secure v)) (.secure (:secure v))
-                          (boolean? (:http-only v)) (.httpOnly (:http-only v))
+                          (boolean? (:secure? v)) (.secure (:secure? v))
+                          (boolean? (:http-only? v)) (.httpOnly (:http-only? v))
                           )))))
 
 (defn- add-headers

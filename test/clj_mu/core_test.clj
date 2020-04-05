@@ -45,7 +45,7 @@
           mu (run-mu {:https-port port})
           mu-uri (.uri mu)
           _ (log/info "mu started here: " (.toString mu-uri))
-          response (client/get (.toString mu-uri) {:insecure? true
+          response (client/get (.toString mu-uri) {:insecure?        true
                                                    :throw-exceptions false})
           _ (stop-mu mu)]
       (is (= port (.getPort mu-uri)))
@@ -57,7 +57,7 @@
           port-two (find-a-free-port)
           _ (log/info "free-one:" port-one "free-two:" port-two)
           mu (run-mu {:port port-one :https-port port-two})
-          mu-uri-http  (.httpUri mu)
+          mu-uri-http (.httpUri mu)
           mu-uri-https (.httpsUri mu)
           _ (log/info "mu started here:" (.toString mu-uri-http) "and here:" (.toString mu-uri-https))
           response-http (client/get (.toString mu-uri-http) {:throw-exceptions false})
@@ -114,9 +114,9 @@
           request-atom (atom nil)
           mu-server (-> mu-builder
                         (GET "/{name}/{blah}" (fn [request]
-                                   (do
-                                     (reset! request-atom request)
-                                     {:status 200 :body "Hello, World!"})))
+                                                (do
+                                                  (reset! request-atom request)
+                                                  {:status 200 :body "Hello, World!"})))
                         (start-mu))
           mu-uri (.uri mu-server)
           response (client/get (str (.toString mu-uri) "/rajshahuk/shouldbeblah"))
@@ -132,9 +132,9 @@
           request-atom (atom nil)
           mu-server (-> mu-builder
                         (GET "/" (fn [request]
-                                                (do
-                                                  (reset! request-atom request)
-                                                  {:status 200 :body "Hello, World!"})))
+                                   (do
+                                     (reset! request-atom request)
+                                     {:status 200 :body "Hello, World!"})))
                         (start-mu))
           mu-uri (.uri mu-server)
           response (client/get (str (.toString mu-uri) "/?name=rajshahuk&something=blah&something=blah2"))
@@ -152,9 +152,9 @@
                         (GET "/" (fn [request]
                                    (do
                                      (reset! request-atom request)
-                                     {:status 200
-                                      :body "Hello, World!"
-                                      :headers {"clj-mu-header" "best-clojure-web-server-eva"
+                                     {:status  200
+                                      :body    "Hello, World!"
+                                      :headers {"clj-mu-header"     "best-clojure-web-server-eva"
                                                 "x-some-new-header" "value-for-some-new-header"}})))
                         (start-mu))
           mu-uri (.uri mu-server)
@@ -174,10 +174,10 @@
                         (GET "/" (fn [request]
                                    (do
                                      (reset! request-atom request)
-                                     {:status 200
-                                      :body "Hello, World!"
+                                     {:status  200
+                                      :body    "Hello, World!"
                                       :cookies {"cookie-one" {:value "cookie-one-value"}
-                                                "cookie-two" {:path "/somepath" :http-only "true" :value "cookie-two-value"}}
+                                                "cookie-two" {:path "/somepath" :http-only? "true" :value "cookie-two-value"}}
                                       })))
                         (start-mu))
           mu-uri (.uri mu-server)
@@ -272,14 +272,43 @@
           mu-server (-> mu-builder (POST "/something"
                                          (fn [request]
                                            {:status 200
-                                            :body (cheshire.core/generate-string (:form-params request))} ))
+                                            :body   (cheshire.core/generate-string (:form-params request))}))
                         (start-mu))
           mu-uri (.uri mu-server)
-          response (client/post (str (.toString mu-uri) "/something") {:form-params {:foo "bar"
-                                                                                     "foo" "bars"
-                                                                                     :cat "dog"}
+          response (client/post (str (.toString mu-uri) "/something") {:form-params      {:foo  "bar"
+                                                                                          "foo" "bars"
+                                                                                          :cat  "dog"}
                                                                        :throw-exceptions false})
           _ (stop-mu mu-server)]
       (is (= 200 (:status response)))
-      (is (= "{\"foo\":[\"bar\",\"bars\"],\"cat\":[\"dog\"]}" (:body response)))
-      )))
+      (is (= "{\"foo\":[\"bar\",\"bars\"],\"cat\":[\"dog\"]}" (:body response))))))
+
+(deftest cookies-are-available-on-the-request
+  (let [mu-builder (configure-mu)
+        cookie-holder (atom nil)
+        cookie-store (clj-http.cookies/cookie-store)
+        mu-server (-> mu-builder
+                      (POST "/set-a-cookie"
+                            (fn [request]
+                              {:status  200
+                               :body    "Hello, World!"
+                               :cookies {"cookie-one" {:value "cookie-one-value"}
+                                         "cookie-two" {:path "/somepath" :http-only? "true" :value "cookie-two-value"}}
+                               }))
+                      (GET "/check-to-see-cookie-can-be-read"
+                           (fn [request]
+                             (do
+                               (reset! cookie-holder (:cookies request))
+                               {:status 200
+                                :body    ""
+                                })))
+                      (start-mu)
+                      )
+        _ (client/post (str (.toString (.uri mu-server)) "/set-a-cookie") {:cookie-store cookie-store})
+        _ (client/get (str (.toString (.uri mu-server)) "/check-to-see-cookie-can-be-read") {:cookie-store cookie-store})
+        _ (stop-mu mu-server)]
+    (log/info "cookie-holder" @cookie-holder)
+    (is (not (nil? @cookie-holder)))
+    (is (= "cookie-one" (-> @cookie-holder first :name)))
+    )
+  )
