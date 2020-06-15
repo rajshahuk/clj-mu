@@ -259,7 +259,7 @@
     (let [mu-builder (configure-mu)
           mu-server (-> mu-builder (POST "/something"
                                          (fn [request]
-                                           {:status 200 :body (:form-params request)}))
+                                           {:status 200 :body (forms request)}))
                         (start-mu))
           mu-uri (.uri mu-server)
           response (client/post (str (.toString mu-uri) "/something") {:throw-exceptions false})
@@ -272,7 +272,7 @@
           mu-server (-> mu-builder (POST "/something"
                                          (fn [request]
                                            {:status 200
-                                            :body   (cheshire.core/generate-string (:form-params request))}))
+                                            :body   (cheshire.core/generate-string (forms request))}))
                         (start-mu))
           mu-uri (.uri mu-server)
           response (client/post (str (.toString mu-uri) "/something") {:form-params      {:foo  "bar"
@@ -282,6 +282,51 @@
           _ (stop-mu mu-server)]
       (is (= 200 (:status response)))
       (is (= "{\"foo\":[\"bar\",\"bars\"],\"cat\":[\"dog\"]}" (:body response))))))
+
+(deftest read-body-of-post-as-string
+  (testing "to see if we can read the body of a post as a string"
+    (let [mu-builder (configure-mu)
+          mu-server (-> mu-builder (POST "/something"
+                                         (fn [request]
+                                           {:status 200
+                                            :body   (body request)}))
+                        (start-mu))
+          mu-uri (.uri mu-server)
+          test-payload {:foo  "bar"
+                 "foo" "bars"
+                 :cat  "dog"}
+          response (client/post (str (.toString mu-uri) "/something") {:body             (cheshire.core/generate-string test-payload)
+                                                                       :throw-exceptions false})
+          _ (stop-mu mu-server)]
+      (is (= 200 (:status response)))
+      (is (= (cheshire.core/generate-string test-payload) (:body response))))))
+
+(deftest make-double-read
+  (testing "to see if you can read the body if you have already read via forms"
+    (let [mu-builder (configure-mu)
+          mu-server (-> mu-builder (POST "/something"
+                                         (fn [request]
+                                           (let [forms (forms request)]
+                                             (try
+                                               {:status 200
+                                                :body   (body request)}
+                                               (catch IllegalStateException e
+                                                 {:status 500
+                                                  :body "Correctly caught exception"}
+                                                 ))
+
+                                             )
+                                           ))
+                        (start-mu))
+          mu-uri (.uri mu-server)
+          test-payload {:foo  "bar"
+                        "foo" "bars"
+                        :cat  "dog"}
+          response (client/post (str (.toString mu-uri) "/something") {:body             (cheshire.core/generate-string test-payload)
+                                                                       :throw-exceptions false})
+          _ (stop-mu mu-server)]
+      (is (= 500 (:status response)))
+      (is (= "Correctly caught exception" (:body response))))))
 
 (deftest cookies-are-available-on-the-request
   (let [mu-builder (configure-mu)
@@ -300,7 +345,7 @@
                              (do
                                (reset! cookie-holder (:cookies request))
                                {:status 200
-                                :body    ""
+                                :body   ""
                                 })))
                       (start-mu)
                       )

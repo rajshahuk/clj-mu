@@ -15,6 +15,22 @@
    :http-only? (.isHttpOnly cookie)
    })
 
+(defn body
+  [request]
+  (-> request
+      :original-mu-request
+      .readBodyAsString))
+
+(defn forms
+  [request]
+  (try
+    (reduce (fn [a v]
+              (assoc a
+                (keyword (.getKey v))
+                (into [] (.getValue v))
+                )) {} (iterator-seq (-> request :original-mu-request .form .all .entrySet .iterator)))
+    (catch Exception e nil)))
+
 (defn extract-request
   "return more of a clojure style request object back so that the handler can be more clojure like"
   [^MuRequest request params]
@@ -31,13 +47,6 @@
                                     (conj a (extract-cookie cookie)))
                                   [] (iterator-seq (-> request .cookies .iterator))))
    :path-params         (clojure.walk/keywordize-keys (into {} params))
-   :form-params         (try
-                          (reduce (fn [a v]
-                                    (assoc a
-                                      (keyword (.getKey v))
-                                      (into [] (.getValue v))
-                                      )) {} (iterator-seq (-> request .form .all .entrySet .iterator)))
-                          (catch Exception e nil))
    :query-params        (reduce (fn [a v]
                                   (assoc a
                                     (keyword (.getKey v))

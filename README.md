@@ -74,6 +74,23 @@ The `request` parameter passed into the function has the following key/values:
 }
 ```
 
+#### Dealing with bodies and forms
+
+You can't read the body and form from the request at the same time. There are some convenience functions
+to read the body or all the forms. 
+
+To the read the body as a string call with a function like this:
+
+```clojure
+(body request)
+```
+
+and for forms:
+
+```clojure
+(forms request)
+```
+
 #### Reading cookies on the request
 
 Cookies are a list of clojure maps with the following keys:
