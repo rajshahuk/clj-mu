@@ -357,3 +357,21 @@
     (is (= "cookie-one" (-> @cookie-holder first :name)))
     )
   )
+
+(deftest path-parameters
+  (let [mu-builder (configure-mu)
+        path-param (atom nil)
+        mu-server (-> mu-builder
+                      (POST "/postparam/{someparam}"
+                            (fn [request]
+                              (log/info "path-param" (:path-params request))
+                              (reset! path-param (-> request :path-params :someparam))
+                              {:status 200
+                               :body @path-param
+                               }))
+                      (start-mu))
+        _ (client/post (str (.toString (.uri mu-server)) "/postparam/blah" ))
+        _ (stop-mu mu-server)]
+    (log/info "path-param" @path-param)
+    (is (= "blah" @path-param))
+    ))

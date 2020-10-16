@@ -4,7 +4,7 @@
   :license {:name "MIT License"
             :url "https://github.com/rajshahuk/clj-mu/blob/master/LICENSE"}
   :dependencies [[org.clojure/clojure "1.10.1"]
-                 [io.muserver/mu-server "0.54.3"]
+                 [io.muserver/mu-server "0.54.8"]
                  [org.clojure/tools.logging "1.1.0"]
                  [ch.qos.logback/logback-classic "1.2.3"]]
   :profiles {:test {:resource-paths ["test/resources"]
