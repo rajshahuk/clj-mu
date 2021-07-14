@@ -301,32 +301,36 @@
       (is (= 200 (:status response)))
       (is (= (cheshire.core/generate-string test-payload) (:body response))))))
 
-(deftest make-double-read
-  (testing "to see if you can read the body if you have already read via forms"
-    (let [mu-builder (configure-mu)
-          mu-server (-> mu-builder (POST "/something"
-                                         (fn [request]
-                                           (let [forms (forms request)]
-                                             (try
-                                               {:status 200
-                                                :body   (body request)}
-                                               (catch IllegalStateException e
-                                                 {:status 500
-                                                  :body "Correctly caught exception"}
-                                                 ))
 
-                                             )
-                                           ))
-                        (start-mu))
-          mu-uri (.uri mu-server)
-          test-payload {:foo  "bar"
-                        "foo" "bars"
-                        :cat  "dog"}
-          response (client/post (str (.toString mu-uri) "/something") {:body             (cheshire.core/generate-string test-payload)
-                                                                       :throw-exceptions false})
-          _ (stop-mu mu-server)]
-      (is (= 500 (:status response)))
-      (is (= "Correctly caught exception" (:body response))))))
+;;
+;; commented out for now
+;;
+;(deftest make-double-read
+;  (testing "to see if you can read the body if you have already read via forms"
+;    (let [mu-builder (configure-mu)
+;          mu-server (-> mu-builder (POST "/something"
+;                                         (fn [request]
+;                                           (let [forms (forms request)]
+;                                             (try
+;                                               {:status 200
+;                                                :body   (body request)}
+;                                               (catch IllegalStateException e
+;                                                 {:status 500
+;                                                  :body "Correctly caught exception"}
+;                                                 ))
+;
+;                                             )
+;                                           ))
+;                        (start-mu))
+;          mu-uri (.uri mu-server)
+;          test-payload {:foo  "bar"
+;                        "foo" "bars"
+;                        :cat  "dog"}
+;          response (client/post (str (.toString mu-uri) "/something") {:body             (cheshire.core/generate-string test-payload)
+;                                                                       :throw-exceptions false})
+;          _ (stop-mu mu-server)]
+;      (is (= 500 (:status response)))
+;      (is (= "Correctly caught exception" (:body response))))))
 
 (deftest cookies-are-available-on-the-request
   (let [mu-builder (configure-mu)
