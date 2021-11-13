@@ -1,6 +1,8 @@
 # clj-mu
 
-[![Build Status](https://api.travis-ci.org/rajshahuk/clj-mu.png?branch=master)](http://travis-ci.org/rajshahuk/clj-mu)
+[![Build Status] ((https://github.com/rajshahuk/clj-mu/actions/workflows/clojure.yml/badge.svg))
+
+(https://api.travis-ci.org/rajshahuk/clj-mu.png?branch=master)](http://travis-ci.org/rajshahuk/clj-mu)
 
 **Note: Use this at your peril, this is a very very early version of the API and it is likely to be change. It has been
 built to 'scratch my own itch'**
