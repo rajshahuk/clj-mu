@@ -3,7 +3,7 @@
   :url "https://github.com/rajshahuk/clj-mu"
   :license {:name "MIT License"
             :url "https://github.com/rajshahuk/clj-mu/blob/master/LICENSE"}
-  :dependencies [[org.clojure/clojure "1.11.0"]
+  :dependencies [[org.clojure/clojure "1.11.1"]
                  [io.muserver/mu-server "0.72.9"]
                  [org.clojure/tools.logging "1.2.4"]
                  [ch.qos.logback/logback-classic "1.2.11"]]
