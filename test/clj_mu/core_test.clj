@@ -387,17 +387,13 @@
                       (HANDLE (fn [request response]
                                 (do
                                   (reset! in-generic-handle? true)
-                                  (log/info "request:" (.toString request))
-                                  false)))
-                      (POST "/postparam/{someparam}"
-                            (fn [request]
-                              (log/info "in-generic-handle?" (:path-params request))
-                              {:status 200
-                               :body (-> request :path-params :someparam)
-                               }))
+                                  (log/info "request:" (.toString request)))))
+                      (HANDLE (fn [_ _]
+                                {:status 200
+                                 :body "hello, world"}))
                       (start-mu))
-        _ (client/post (str (.toString (.uri mu-server)) "/postparam/blah" ))
+        response (client/get (str (.toString (.uri mu-server)) "/" ))
         _ (stop-mu mu-server)]
-    (log/info "in-generic-handle?" @in-generic-handle?)
+    (log/info (:body response))
     (is (true? @in-generic-handle?))
     ))

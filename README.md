@@ -174,13 +174,15 @@ A generic handler can be created like this:
     (HANDLE (fn [request response]
               (do
                 (reset! in-generic-handle? true)
-                (log/info "request:" (.toString request))
-                false)))
-    ;; add more handlers
+                (log/info "request:" (.toString request)))))
+    (HANDLE (fn [_ _]
+              {:status 200
+               :body "hello, world"}))
     (start-mu))
 ```
 
-The handler function must return false if you want to continue to running through the request pipeline, true otherwise.
+If at the end of the handle function you return a map with a status it will continue to process further handlers,
+it will instead return the response.
     
 ### Special Handlers
 

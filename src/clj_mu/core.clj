@@ -85,8 +85,16 @@
 
 (defn create-handler [handler]
   (reify MuHandler
-    (handle [_ request response]
-      (handler (extract-request request nil) response))))
+    (handle [_ req res]
+      (let [{body :body headers :headers status :status cookies :cookies} (handler (extract-request req nil) res)]
+        (if (nil? status)
+          false
+          (do
+            (.status res status)
+            (when headers (add-headers res headers))
+            (when cookies (add-cookies res cookies))
+            (.write res body)
+            true))))))
 
 (defn create-route-handler [handler]
   (reify RouteHandler
