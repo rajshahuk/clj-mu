@@ -86,7 +86,7 @@
 (defn create-handler [handler]
   (reify MuHandler
     (handle [_ request response]
-      (handler request response))))
+      (handler (extract-request request nil) response))))
 
 (defn create-route-handler [handler]
   (reify RouteHandler
