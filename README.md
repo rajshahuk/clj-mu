@@ -163,7 +163,25 @@ The follow are optional:
     } 
 }
 ```
+### Generic Handlers
 
+A more generic handler can also be created, they are described here: <https://muserver.io/routes>
+
+A generic handler can be created like this:
+
+```clojure
+(-> mu-builder
+    (HANDLE (fn [request response]
+              (do
+                (reset! in-generic-handle? true)
+                (log/info "request:" (.toString request))
+                false)))
+    ;; add more handlers
+    (start-mu))
+```
+
+The handler function must return false if you want to continue to running through the request pipeline, true otherwise.
+    
 ### Special Handlers
 
 #### Hosting static content

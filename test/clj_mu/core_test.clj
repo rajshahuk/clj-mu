@@ -379,3 +379,25 @@
     (log/info "path-param" @path-param)
     (is (= "blah" @path-param))
     ))
+
+(deftest test-generic-handle
+  (let [mu-builder (configure-mu)
+        in-generic-handle? (atom false)
+        mu-server (-> mu-builder
+                      (HANDLE (fn [request response]
+                                (do
+                                  (reset! in-generic-handle? true)
+                                  (log/info "request:" (.toString request))
+                                  false)))
+                      (POST "/postparam/{someparam}"
+                            (fn [request]
+                              (log/info "in-generic-handle?" (:path-params request))
+                              {:status 200
+                               :body (-> request :path-params :someparam)
+                               }))
+                      (start-mu))
+        _ (client/post (str (.toString (.uri mu-server)) "/postparam/blah" ))
+        _ (stop-mu mu-server)]
+    (log/info "in-generic-handle?" @in-generic-handle?)
+    (is (true? @in-generic-handle?))
+    ))

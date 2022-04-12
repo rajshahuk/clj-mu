@@ -1,7 +1,7 @@
 (ns clj-mu.core
   (:require
     [clojure.tools.logging :as log])
-  (:import (io.muserver MuServer MuServerBuilder RouteHandler Method MuRequest MuResponse CookieBuilder ContextHandlerBuilder)
+  (:import (io.muserver MuServer MuServerBuilder RouteHandler Method MuRequest MuResponse CookieBuilder ContextHandlerBuilder MuHandler)
            (io.muserver.handlers ResourceHandlerBuilder)))
 
 (defn- extract-cookie
@@ -83,6 +83,11 @@
       (.set hdrs (name k) v)))
   )
 
+(defn create-handler [handler]
+  (reify MuHandler
+    (handle [_ request response]
+      (handler request response))))
+
 (defn create-route-handler [handler]
   (reify RouteHandler
     (handle [_ req res params]
@@ -92,6 +97,9 @@
         (when headers (add-headers res headers))
         (when cookies (add-cookies res cookies))
         (.write res body)))))
+
+(defn HANDLE [mu-builder handler]
+  (.addHandler mu-builder (create-handler handler)))
 
 (defn DELETE [mu-builder path handler]
   (.addHandler mu-builder Method/DELETE path (create-route-handler handler)))
