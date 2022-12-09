@@ -1,0 +1,51 @@
+; Jacking in...
+; Aborting jack-in. No project type selected.
+; nREPL Connection was closed
+; Jacking in...
+; Starting Jack-in Terminal: lein update-in :dependencies conj '[nrepl,"1.0.0"]' -- update-in :plugins conj '[cider/cider-nrepl,"0.28.5"]' -- update-in '[:repl-options,:nrepl-middleware]' conj '["cider.nrepl/cider-middleware"]' -- repl :headless
+; Hooking up nREPL sessions...
+; Connected session: clj
+; TIPS:
+;   - You can edit the contents here. Use it as a REPL if you like.
+;   - `alt+enter` evaluates the current top level form.
+;   - `ctrl+enter` evaluates the current form.
+;   - `alt+up` and `alt+down` traverse up and down the REPL command history
+;      when the cursor is after the last contents at the prompt
+;   - Clojure lines in stack traces are peekable and clickable.
+clj꞉clj-mu.core꞉> 
+; Jack-in done.
+clj꞉clj-mu.core꞉> 
+; Syntax error compiling at (test/clj_mu/core_test.clj:8:1).
+; Unable to resolve symbol: deftest in this context
+clj꞉clj-mu.core-test꞉> 
+; Execution error (FileNotFoundException) at clj-mu.core-test/eval6510$loading (form-init7992749990914284161.clj:1).
+; Could not locate clj_http/client__init.class, clj_http/client.clj or clj_http/client.cljc on classpath. Please check that namespaces with dashes use underscores in the Clojure file name.
+clj꞉clj-mu.core-test꞉> 
+nil
+clj꞉clj-mu.core꞉> 
+nil
+clj꞉clj-mu.core꞉> 
+#'clj-mu.core/extract-cookie
+clj꞉clj-mu.core꞉> 
+#'clj-mu.core/body
+clj꞉clj-mu.core꞉> 
+#'clj-mu.core/run-mu
+clj꞉clj-mu.core꞉> (def mu (run-mu))
+#'clj-mu.core/mu
+clj꞉clj-mu.core꞉> 
+mu
+#object[io.muserver.MuServerImpl 0x6cf00529 "MuServerImpl{httpUri=http://localhost:62988, httpsUri=null, stats=Active requests: 0; completed requests: 0; active connections: 0; completed connections: 0; invalid requests: 0; bytes received: 0; bytes sent: 0; rejected: 0; connectionFailured: 0, address=/[0:0:0:0:0:0:0:0]:62988}"]
+clj꞉clj-mu.core꞉> 
+mu/getPort
+; Syntax error compiling at (.calva/output-window/output.calva-repl:1:7974).
+; No such namespace: mu
+clj꞉clj-mu.core꞉> 
+(.toString mu)
+"MuServerImpl{httpUri=http://localhost:62988, httpsUri=null, stats=Active requests: 0; completed requests: 0; active connections: 0; completed connections: 0; invalid requests: 0; bytes received: 0; bytes sent: 0; rejected: 0; connectionFailured: 0, address=/[0:0:0:0:0:0:0:0]:62988}"
+clj꞉clj-mu.core꞉> 
+(.stop mu)
+nil
+clj꞉clj-mu.core꞉> 
+(.toString mu)
+"MuServerImpl{httpUri=http://localhost:62988, httpsUri=null, stats=Active requests: 0; completed requests: 2; active connections: 0; completed connections: 1; invalid requests: 0; bytes received: 683; bytes sent: 390; rejected: 0; connectionFailured: 0, address=/[0:0:0:0:0:0:0:0]:62988}"
+clj꞉clj-mu.core꞉> 
