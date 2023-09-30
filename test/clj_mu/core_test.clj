@@ -177,7 +177,7 @@
                                      {:status  200
                                       :body    "Hello, World!"
                                       :cookies {"cookie-one" {:value "cookie-one-value"}
-                                                "cookie-two" {:path "/somepath" :http-only? "true" :value "cookie-two-value"}}
+                                                "cookie-two" {:path "/somepath" :http-only? "true" :value "cookie-two-value" :max-age 1000}}
                                       })))
                         (start-mu))
           mu-uri (.uri mu-server)
@@ -191,7 +191,9 @@
       (is (= "cookie-one-value" (:value cookie-one)))
       (is (= "/" (:path cookie-one)))
       (is (false? (:secure cookie-one)))
-      (is (= "/somepath" (:path cookie-two))))))
+      (is (nil? (:expires cookie-one)))
+      (is (= "/somepath" (:path cookie-two)))
+      (is (not (nil? (:expires cookie-two)))))))
 
 (deftest test-static-file-server
   (testing "to ensure that we can create a web server that services static files"

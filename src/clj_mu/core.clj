@@ -73,6 +73,7 @@
                           (string? (:path v)) (.withPath (:path v))
                           (boolean? (:secure? v)) (.secure (:secure? v))
                           (boolean? (:http-only? v)) (.httpOnly (:http-only? v))
+                          (number? (:max-age v)) (.withMaxAgeInSeconds (:max-age v))
                           )))))
 
 (defn- add-headers

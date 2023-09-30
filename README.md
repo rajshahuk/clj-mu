@@ -100,7 +100,7 @@ Cookies are a list of clojure maps with the following keys:
    :value      COOKIE_VALUE
    :domain     COOKIE_DOMAIN
    :path       COOKIE_PATH
-   :max-age    MAX_AGE_AS_LONG
+   :max-age    MAX_AGE_IN_SECONDS_AS_LONG
    :secure?    TRUE / FALSE
    :http-only? TRUE / FALSE
 }
@@ -159,6 +159,7 @@ The follow are optional:
           :path "/" ;; optional value - defaults to "/"
           :secure? true ;; optional defaults to false
           :http-only? true ;; defaults to false
+          :max-age 100 ;; optional value - if none supplied this is a session cookie
         }
     } 
 }
