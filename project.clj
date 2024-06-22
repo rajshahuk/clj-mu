@@ -1,10 +1,10 @@
-(defproject com.twelvenines/clj-mu "0.1.2"
+(defproject com.twelvenines/clj-mu "0.1.3"
   :description "Clojure friendly library for using https://muserver.io"
   :url "https://github.com/rajshahuk/clj-mu"
   :license {:name "MIT License"
             :url "https://github.com/rajshahuk/clj-mu/blob/master/LICENSE"}
   :dependencies [[org.clojure/clojure "1.11.3"]
-                 [io.muserver/mu-server "1.1.2"]
+                 [io.muserver/mu-server "2.0.1"]
                  [org.clojure/tools.logging "1.3.0"]]
   :profiles {:dev {:resource-paths ["test/resources"]
                     :dependencies   [[cheshire "5.13.0"]
