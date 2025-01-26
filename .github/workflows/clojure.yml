@@ -22,7 +22,6 @@ jobs:
       - name: Install clojure tools
         uses: DeLaGuardo/setup-clojure@13.0
         with:
-          cli: 1.12.0
           lein: 2.9.1
       - name: Install dependencies
         run: lein deps
