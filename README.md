@@ -5,6 +5,8 @@
 **Note: Use this at your peril, this is a very very early version of the API and it is likely to be change. It has been
 built to 'scratch my own itch'**
 
+_In versions >1.0.0 mu-server is removed as a dependency of this library. You must include this yourself._ 
+
 Clojure friendly library for using https://muserver.io
 
 This library has been written to allow more a _clojure-ey_ way to use MuServer. It has been written
@@ -18,7 +20,7 @@ by them after more than a year of building services with them.
 
 [![Clojars Project](https://img.shields.io/clojars/v/com.twelvenines/clj-mu.svg)](https://clojars.org/com.twelvenines/clj-mu)
 
-Add clj-mu as a dependency to your project and then add the following to your `require` definition
+Add clj-mu and mu-server as a dependency to your project and then add the following to your `require` definition
 ```clojure
 [clj-mu.core :refer :all]
 ```
